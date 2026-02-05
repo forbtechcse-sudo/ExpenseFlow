@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ExpenseFlow – Real App</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="logo">
+        <div class="logo-icon">E</div>
+        <div class="logo-text">
+          <h1>ExpenseFlow</h1>
+          <p>Smart expense tracking</p>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-main="dashboard">Dashboard</button>
+        <button class="nav-item" data-main="all-expenses">All Expenses</button>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2 id="mainTitle">Dashboard</h2>
+          <p>Overview of your expenses and spending habits</p>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn ghost" id="exportBtn">Export CSV</button>
+          <button class="btn primary" id="addExpenseBtn">+ Add Expense</button>
+        </div>
+      </header>
+
+      <section class="filters" id="periodFilters">
+        <div class="chip-group">
+          <button class="chip active" data-period="7">Last 7 Days</button>
+          <button class="chip" data-period="30">Last 30 Days</button>
+          <button class="chip" data-period="90">Last 3 Months</button>
+          <button class="chip" data-period="180">Last 6 Months</button>
+          <button class="chip" data-period="365">This Year</button>
+          <button class="chip" data-period="all">All Time</button>
+        </div>
+      </section>
+
+      <section class="cards-row" id="summaryCards">
+        <div class="stat-card">
+          <p class="stat-label" id="summaryPeriodLabel">Last 7 Days Total</p>
+          <h3 class="stat-value" id="totalAmount">₹0.00</h3>
+          <p class="stat-meta">
+            <span id="totalTransactions">0</span> transactions
+          </p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Average Expense</p>
+          <h3 class="stat-value" id="avgAmount">₹0.00</h3>
+          <p class="stat-meta">Per transaction</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">This Month</p>
+          <h3 class="stat-value" id="monthAmount">₹0.00</h3>
+          <p class="stat-meta">
+            Categories: <span id="categoriesCount">0</span>
+          </p>
+        </div>
+      </section>
+
+      <section class="tabs-section" id="tabsSection">
+        <div class="tabs">
+          <button class="tab active" data-tab="overview">Overview</button>
+          <button class="tab" data-tab="daily">Daily</button>
+          <button class="tab" data-tab="monthly">Monthly</button>
+          <button class="tab" data-tab="budget">Budget</button>
+          <button class="tab" data-tab="predictions">Predictions</button>
+          <button class="tab" data-tab="all-expenses">All Expenses</button>
+        </div>
+      </section>
+
+      <section class="tab-content active" id="tab-overview">
+        <div class="two-column">
+          <div class="card">
+            <div class="card-header">
+              <h3>Recent Expenses</h3>
+            </div>
+            <div class="table">
+              <div class="table-row table-header">
+                <div>Title</div>
+                <div>Category</div>
+                <div>Date</div>
+                <div>Amount</div>
+                <div>Actions</div>
+              </div>
+              <div id="recentExpensesBody"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Spending by Category</h3>
+              <div class="chip-group small">
+                <button class="chip small active" data-chart-type="pie">Pie Chart</button>
+                <button class="chip small" data-chart-type="bar">Bar Chart</button>
+              </div>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="categoryChartCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-content" id="tab-daily">
+        <div class="card">
+          <div class="card-header">
+            <h3>Daily Analysis</h3>
+            <p>Track your day-to-day spending patterns</p>
+          </div>
+          <div class="cards-row">
+            <div class="stat-card small">
+              <p class="stat-label">Period Total</p>
+              <h3 class="stat-value" id="dailyPeriodTotal">₹0.00</h3>
+              <p class="stat-meta" id="dailyRangeLabel">Last 30 days</p>
+            </div>
+            <div class="stat-card small">
+              <p class="stat-label">Daily Average</p>
+              <h3 class="stat-value" id="dailyAverage">₹0.00</h3>
+              <p class="stat-meta" id="dailyActiveDays">0 active days</p>
+            </div>
+            <div class="stat-card small">
+              <p class="stat-label">Highest Day</p>
+              <h3 class="stat-value" id="highestDayAmount">₹0.00</h3>
+              <p class="stat-meta" id="highestDayLabel">–</p>
+            </div>
+          </div>
+          <div class="chart-wrapper large">
+            <canvas id="dailyChartCanvas"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-content" id="tab-monthly">
+        <div class="card">
+          <div class="card-header">
+            <h3>Monthly Overview</h3>
+            <p>Track your spending patterns month by month</p>
+          </div>
+          <div class="cards-row">
+            <div class="stat-card small">
+              <p class="stat-label">Year Total</p>
+              <h3 class="stat-value" id="yearTotal">₹0.00</h3>
+            </div>
+            <div class="stat-card small">
+              <p class="stat-label">Monthly Average</p>
+              <h3 class="stat-value" id="monthAverage">₹0.00</h3>
+            </div>
+            <div class="stat-card small">
+              <p class="stat-label">This Month</p>
+              <h3 class="stat-value" id="thisMonthTotal">₹0.00</h3>
+            </div>
+          </div>
+          <div class="chart-wrapper large">
+            <canvas id="monthlyChartCanvas"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-content" id="tab-budget">
+        <div class="card">
+          <div class="card-header">
+            <h3>Budget Overview</h3>
+          </div>
+          <div class="budget-row">
+            <div>
+              <p>Total Budget</p>
+              <h3 id="budgetTotal">₹10,000.00</h3>
+              <p id="budgetMeta">₹0.00 spent • On track</p>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" id="budgetProgress"></div>
+            </div>
+            <button class="btn ghost" id="setBudgetBtn">+ Set Budget</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-content" id="tab-predictions">
+        <div class="card">
+          <div class="card-header">
+            <h3>Spending Trend & Predictions</h3>
+          </div>
+          <div class="cards-row">
+            <div class="stat-card small">
+              <p class="stat-label">Next Month Predicted</p>
+              <h3 class="stat-value" id="nextMonthPredicted">₹0.00</h3>
+            </div>
+            <div class="stat-card small">
+              <p class="stat-label">This Month Projected</p>
+              <h3 class="stat-value" id="thisMonthProjected">₹0.00</h3>
+            </div>
+            <div class="stat-card small">
+              <p class="stat-label">Daily Average</p>
+              <h3 class="stat-value" id="predictionDailyAverage">₹0.00</h3>
+            </div>
+          </div>
+          <div class="chart-wrapper large">
+            <canvas id="predictionChartCanvas"></canvas>
+          </div>
+          <div class="category-predictions" id="categoryPredictions"></div>
+        </div>
+      </section>
+
+      <section class="tab-content" id="tab-all-expenses">
+        <div class="card">
+          <div class="card-header">
+            <h3>All Expenses</h3>
+          </div>
+          <div class="filters-row">
+            <input type="text" id="searchInput" placeholder="Search expenses by title or description..." />
+            <select id="categoryFilter">
+              <option value="">All Categories</option>
+              <option>Food & Dining</option>
+              <option>Transportation</option>
+              <option>Entertainment</option>
+              <option>Shopping</option>
+              <option>Health</option>
+              <option>Subscriptions</option>
+              <option>Travel</option>
+              <option>Gifts & Donations</option>
+            </select>
+          </div>
+          <div class="table">
+            <div class="table-row table-header">
+              <div>Title</div>
+              <div>Category</div>
+              <div>Date</div>
+              <div>Amount</div>
+              <div>Actions</div>
+            </div>
+            <div id="allExpensesBody"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="main-view" id="main-all-expenses" style="display:none;">
+        <div class="card">
+          <div class="card-header">
+            <h3>All Expenses</h3>
+          </div>
+          <div class="filters-row">
+            <input type="text" id="mainSearchInput" placeholder="Search expenses by title or description..." />
+            <select id="mainCategoryFilter">
+              <option value="">All Categories</option>
+              <option>Food & Dining</option>
+              <option>Transportation</option>
+              <option>Entertainment</option>
+              <option>Shopping</option>
+              <option>Health</option>
+              <option>Subscriptions</option>
+              <option>Travel</option>
+              <option>Gifts & Donations</option>
+            </select>
+          </div>
+          <div class="table">
+            <div class="table-row table-header">
+              <div>Title</div>
+              <div>Category</div>
+              <div>Date</div>
+              <div>Amount</div>
+              <div>Actions</div>
+            </div>
+            <div id="mainAllExpensesBody"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modals -->
+  <div class="modal-backdrop" id="expenseModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Add New Expense</h3>
+        <button class="close-btn" data-close="expenseModal">&times;</button>
+      </div>
+      <p>Track your spending by adding a new expense entry.</p>
+      <form id="expenseForm">
+        <label>Title<input type="text" id="titleInput" required /></label>
+        <label>Amount (₹)<input type="number" id="amountInput" required /></label>
+        <label>Date<input type="date" id="dateInput" required /></label>
+        <label>Category
+          <select id="categoryInput" required>
+            <option value="">Select category</option>
+            <option>Food & Dining</option>
+            <option>Transportation</option>
+            <option>Entertainment</option>
+            <option>Shopping</option>
+            <option>Health</option>
+            <option>Subscriptions</option>
+            <option>Travel</option>
+            <option>Gifts & Donations</option>
+          </select>
+        </label>
+        <label>Description (optional)<textarea id="descriptionInput" rows="3"></textarea></label>
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" data-close="expenseModal">Cancel</button>
+          <button type="submit" class="btn primary">Add Expense</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="budgetModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Set Monthly Budget</h3>
+        <button class="close-btn" data-close="budgetModal">&times;</button>
+      </div>
+      <form id="budgetForm">
+        <label>Budget Amount (₹)<input type="number" id="budgetInput" required /></label>
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" data-close="budgetModal">Cancel</button>
+          <button type="submit" class="btn primary">Save Budget</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="exportModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Export Expense Report</h3>
+        <button class="close-btn" data-close="exportModal">&times;</button>
+      </div>
+      <label>Report Period
+        <select id="exportPeriod">
+          <option value="thisMonth">This Month</option>
+          <option value="30">Last 30 Days</option>
+          <option value="all">All Time</option>
+        </select>
+      </label>
+      <p>Report will include summary, category breakdown and detailed expense list (CSV file).</p>
+      <div class="modal-actions">
+        <button type="button" class="btn ghost" data-close="exportModal">Cancel</button>
+        <button type="button" class="btn primary" id="downloadCsvBtn">Download CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
